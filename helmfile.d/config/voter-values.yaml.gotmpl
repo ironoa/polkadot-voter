@@ -1,0 +1,11 @@
+{{ if eq .Environment.Name "ci" }}
+image:
+  tag: {{ env "CIRCLE_SHA1" | default "kind" }}
+{{ else if eq .Environment.Name "local" }}
+image:
+  repo: localhost:5000/polkadot-voter
+  tag: latest
+{{ end }}
+
+config:
+  logLevel: debug  

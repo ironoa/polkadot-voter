@@ -1,0 +1,11 @@
+wsEndpoint: "wss://governance2-testnet.litentry.io"
+logLevel: info
+voter:
+  walletFilePath: /path.json
+  passwordFilePath: /path.txt
+matrixbot:
+  enabled: true
+  baseUrl: "https://matrix.org"
+  accessToken: "xxx_xxx"
+  userId: "@bot:matrix.org"
+  room: "!xxx:matrix.org"

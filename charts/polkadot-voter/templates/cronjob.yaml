@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: {{ .Release.Name }}
+          annotations:
+            checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        spec:
+          {{- if .Values.cronjob.affinity }}
+          affinity:
+{{ toYaml .Values.cronjob.affinity | indent 12 }}      
+          {{- end }}          
+          {{- if .Values.cronjob.tolerations }}          
+          tolerations:
+{{ toYaml .Values.cronjob.tolerations | indent 12 }}
+          {{- end }} 
+          # restartPolicy: Never
+          containers:
+          - name: {{ .Release.Name }}
+            image: {{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+            imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+            {{ if eq .Values.config.cronjob.timeout true }}
+            command: ["timeout", "1200", "yarn", "start"]
+            {{ end }} 
+            args:
+            - -c
+            - /app/config/main.yaml
+            # ports:
+            # - name: metrics
+            #   containerPort: {{ .Values.config.port }}       
+            # livenessProbe:
+            #   httpGet:
+            #     path: /healthcheck
+            #     port: {{ .Values.config.port }}
+            #   initialDelaySeconds: 10
+            #   timeoutSeconds: 200
+            {{ if ne .Values.environment "ci" }}
+            resources:
+              {{- toYaml .Values.resources | nindent 14 }}
+            {{ end }}
+            volumeMounts:
+            - name: config
+              mountPath: /app/config 
+            - name: secret-wallet
+              mountPath: {{ dir .Values.config.voter.walletFilePath }}
+              readOnly: true
+            - name: secret-password
+              mountPath: {{ dir .Values.config.voter.passwordFilePath }}
+              readOnly: true  
+          volumes:
+          - name: config
+            configMap:
+              name: {{ .Release.Name }} 
+          - name: secret-wallet
+            secret:
+              secretName: {{ .Release.Name }}-wallet
+              items:
+              - key: voter_wallet_json
+                path: {{ base .Values.config.voter.walletFilePath }} 
+          - name: secret-password
+            secret:
+              secretName: {{ .Release.Name }}-password
+              items:
+              - key: voter_password
+                path: {{ base .Values.config.voter.passwordFilePath }}     

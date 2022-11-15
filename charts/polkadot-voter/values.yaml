@@ -1,0 +1,35 @@
+image:
+  repo: web3f/polkadot-voter
+  #tag: latest
+
+config:
+  wsEndpoint: "wss://governance2-testnet.litentry.io"
+  logLevel: info
+  voter:
+    walletFilePath: '/app/keystore/wallet/wallet.json'
+    passwordFilePath: '/app/keystore/password/password'
+  matrixbot:
+    enabled: true
+    baseUrl: "https://matrix.org"
+    accessToken: "xxx_xxx"
+    userId: "@bot:matrix.org"
+    room: "!xxx:matrix.org"
+
+secret:
+  voterPasswordValue: '}b#%q.~0QAWog'
+  voterWalletValue: |
+    {"address":"5EZj5n2epr2J1sVe2PhNJhJJ8JHZ8jdcQ7iyrbzkpguCDQxb","encoded":"ZOu66lvbZQ1OilENNSxTNiLmcjUeCxnvD7G3NSP2ClYAgAAAAQAAAAgAAAC2nWTkigv/aP7FgS8GM4v7szpTan7+DSfo6VJRqyDty6HWNbWo+3Zr2i1zC8l/gNTHUEm5Iz+lZiLo9GEk17yVDDLLI1Dn5N+oSCrm1wTsm2r4zxem5v9ZU/vdsNqXyDakvAELagtWFKwWxQaROnHn74Wzw9Uu73TCnQUUu+kRFnXS4DXnJF0nskQrxqPYwDO4xvBZtcWppIS6of94","encoding":{"content":["pkcs8","sr25519"],"type":["scrypt","xsalsa20-poly1305"],"version":"3"},"meta":{"name":"trash test code","whenCreated":1600669656080}}
+
+
+cronjob:
+  schedule: "* * * * *"    
+  tolerations: []
+  affinity: {}
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "200Mi"
+  limits:
+    cpu: "600m"
+    memory: "600Mi"
